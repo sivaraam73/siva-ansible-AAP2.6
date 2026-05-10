@@ -1,3 +1,20 @@
+# Ignore a folder named 'temp' anywhere in the repository
+temp/
+aap/
+
+
+# Ignore a folder named 'dist' only at the root of the repository
+/dist/
+
+# Ignore all 'build' folders at any level of the project
+**/build/
+
+# Ignore everything in 'logs' except for a specific file
+logs/*
+!logs/important.log
+
+
+
 *.log
 *.logfiles
 *.logs
