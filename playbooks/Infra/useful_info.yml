@@ -1,0 +1,20 @@
+---
+- name: Debug System Information Playbook
+  hosts: all
+  gather_facts: yes  # Ensures facts are gathered
+  tasks:
+    - name: Display Server Info
+      debug:
+        msg:
+          - "Hostname: {{ ansible_hostname }}"
+          - "OS Family: {{ ansible_os_family }}"
+          - "OS Distribution: {{ ansible_distribution }}"
+          - "OS Version: {{ ansible_distribution_version }}"
+          - "Kernel: {{ ansible_kernel }}"
+          - "Python Version: {{ ansible_python_version }}"
+          - "Architecture: {{ ansible_architecture }}"
+
+    # Optionally display all available facts (very verbose)
+    # - name: Dump all facts
+    #   debug:
+    #     var: ansible_facts
