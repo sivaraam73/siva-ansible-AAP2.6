@@ -3,6 +3,7 @@ temp/
 aap/
 /aap/*
 /aap
+.vagrant
 
 # Ignore a folder named 'dist' only at the root of the repository
 /dist/

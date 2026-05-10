@@ -1,7 +1,0 @@
----
-- name: Create configuration directories
-  ansible.builtin.file:
-    path: "{{ automationmetrics_config_path }}"
-    state: directory
-    mode: '0770'
-...
