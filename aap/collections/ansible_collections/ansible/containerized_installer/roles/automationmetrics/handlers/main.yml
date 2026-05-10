@@ -1,0 +1,7 @@
+---
+- name: Restart automation metrics
+  ansible.builtin.systemd:
+    name: automation-metrics-service.service
+    scope: user
+    state: restarted
+...

@@ -1,0 +1,95 @@
+---
+- name: Set automation metrics facts
+  ansible.builtin.set_fact:
+    __automationmetrics_container_name: automation-metrics-service
+
+- name: Set automation metrics network facts
+  ansible.builtin.set_fact:
+    _automationmetrics_bind_address: "{{ (ansible_all_ipv6_addresses | length > 0) | ternary('[::]', '0.0.0.0') }}"
+    _automationmetrics_ports:
+      - "{{ automationmetrics_api_port }}"
+
+- name: Set automation metrics environment facts
+  ansible.builtin.set_fact:
+    _automationmetrics_env:
+      METRICS_SERVICE_MODE: "production"
+      METRICS_SERVICE_DATABASES__default__HOST: "{{ automationmetrics_pg_host }}"
+      METRICS_SERVICE_DATABASES__default__PORT: "{{ automationmetrics_pg_port | string }}"
+      METRICS_SERVICE_DATABASES__default__NAME: "{{ automationmetrics_pg_database }}"
+      METRICS_SERVICE_DATABASES__default__USER: "{{ automationmetrics_pg_username }}"
+      METRICS_SERVICE_DATABASES__default__OPTIONS__sslmode: "{{ automationmetrics_pg_sslmode }}"
+      METRICS_SERVICE_DATABASES__default__OPTIONS__options: "-c datestyle=ISO,\\ MDY"
+      METRICS_SERVICE_DATABASES__awx__HOST: "{{ automationmetrics_pg_host }}"
+      METRICS_SERVICE_DATABASES__awx__PORT: "{{ automationmetrics_pg_port | string }}"
+      METRICS_SERVICE_DATABASES__awx__NAME: "{{ automationmetrics_controller_db }}"
+      METRICS_SERVICE_DATABASES__awx__USER: "{{ automationmetrics_controller_pg_username }}"
+      METRICS_SERVICE_DATABASES__awx__OPTIONS__sslmode: "{{ automationmetrics_pg_sslmode }}"
+      METRICS_SERVICE_DATABASES__awx__OPTIONS__datestyle: "iso, mdy"
+      METRICS_SERVICE_DEBUG: "false"
+
+- name: Add automation metrics extra settings to environment
+  ansible.builtin.set_fact:
+    _automationmetrics_env: '{{ _automationmetrics_env | combine({item.setting: item.value}) }}'
+  loop: '{{ automationmetrics_extra_settings }}'
+  when: automationmetrics_extra_settings | length > 0
+
+- name: Set automation metrics secrets facts
+  ansible.builtin.set_fact:
+    _automationmetrics_secrets:
+      - 'automationmetrics_secret_key,type=env,target=METRICS_SERVICE_SECRET_KEY'
+
+- name: Add database password secrets when not using certificate authentication
+  ansible.builtin.set_fact:
+    _automationmetrics_secrets: >-
+      {{
+        _automationmetrics_secrets +
+        ['automationmetrics_pg_password,type=env,target=METRICS_SERVICE_DATABASES__default__PASSWORD',
+         'automationmetrics_controller_read_pg_password,type=env,target=METRICS_SERVICE_DATABASES__awx__PASSWORD']
+      }}
+  when: not automationmetrics_pg_cert_auth | bool
+
+- name: Set automation metrics common secrets facts
+  ansible.builtin.set_fact:
+    _common_secrets: '{{ _automationmetrics_secrets }}'
+
+- name: Set automation metrics volumes facts
+  ansible.builtin.set_fact:
+    _common_volumes:
+      - '{{ _ca_tls_dir }}/extracted:/etc/pki/ca-trust/extracted:z'
+
+- name: Add postgresql socket volume to common volumes
+  ansible.builtin.set_fact:
+    _common_volumes: '{{ _common_volumes + _postgresql_volumes }}'
+  vars:
+    _postgresql_volumes:
+      - '{{ automationmetrics_pg_socket }}:{{ automationmetrics_pg_socket }}:z'
+  when: automationmetrics_pg_socket is defined
+
+- name: Add postgresql TLS volumes to common volumes
+  ansible.builtin.set_fact:
+    _common_volumes: '{{ _common_volumes + _postgresql_tls_volumes }}'
+  vars:
+    _postgresql_tls_volumes:
+      - '{{ automationmetrics_config_path }}/postgresql.cert:/etc/automation-metrics/postgresql.cert:ro,z'
+      - '{{ automationmetrics_config_path }}/postgresql.key:/etc/automation-metrics/postgresql.key:ro,z'
+  when: automationmetrics_pg_cert_auth | bool
+
+- name: Add postgresql TLS options to environment
+  ansible.builtin.set_fact:
+    _automationmetrics_env: >-
+      {{ _automationmetrics_env | combine({
+        'METRICS_SERVICE_DATABASES__default__OPTIONS__sslcert': automationmetrics_config_path + '/postgresql.cert',
+        'METRICS_SERVICE_DATABASES__default__OPTIONS__sslkey': automationmetrics_config_path + '/postgresql.key',
+        'METRICS_SERVICE_DATABASES__default__OPTIONS__sslrootcert': ca_trust_bundle
+      }) }}
+  when: automationmetrics_pg_cert_auth | bool
+
+- name: Add postgresql container to requires when on the same node
+  ansible.builtin.set_fact:
+    __metrics_container_requires: >-
+      {{ ((inventory_hostname in groups.get('database', [])) | ternary(['postgresql'], [])) }}
+
+- name: Set automation metrics systemd requires
+  ansible.builtin.set_fact:
+    __systemd_requires: '{{ __metrics_container_requires | sort | product([".service"]) | map("join") | list }}'
+...

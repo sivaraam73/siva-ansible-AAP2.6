@@ -1,0 +1,43 @@
+---
+### container
+container_log_driver: journald
+
+### common
+aap_volumes_dir: '{{ ansible_user_dir }}/aap'
+archive_compressed_extension: "tar.gz"
+archive_decompressed_extension: "tar"
+db_compressed_extension: db.gz
+db_decompressed_extension: db
+
+### backup/restore
+automationmetrics_use_archive_compression: "{{ use_archive_compression | default(true) }}"
+automationmetrics_use_db_compression: "{{ use_db_compression | default(false) }}"
+
+### metrics service
+automationmetrics_config_path: "{{ aap_volumes_dir }}/automationmetrics/config"
+automationmetrics_volume_path: "{{ aap_volumes_dir }}/automationmetrics"
+automationmetrics_api_port: 8006
+automationmetrics_firewall_zone: public
+
+### database
+automationmetrics_pg_port: 5432
+automationmetrics_pg_database: metrics_service
+automationmetrics_pg_username: metrics_service
+automationmetrics_pg_sslmode: prefer
+automationmetrics_pg_cert_auth: false
+
+# Controller database (read-only access)
+automationmetrics_controller_db: awx
+automationmetrics_controller_pg_username: ms_awx_readonly
+
+### security
+automationmetrics_secret_key: "{{ lookup('password', '/dev/null length=50 chars=ascii_letters,digits') }}"
+
+### TLS CA
+ca_trust_bundle: /etc/pki/tls/certs/ca-bundle.crt
+
+### extra settings
+automationmetrics_extra_settings: []
+
+### TLS for postgresql
+automationmetrics_tls_remote: false
