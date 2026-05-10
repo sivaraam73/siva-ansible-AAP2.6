@@ -1,7 +1,8 @@
 # Ignore a folder named 'temp' anywhere in the repository
 temp/
 aap/
-
+/aap/*
+/aap
 
 # Ignore a folder named 'dist' only at the root of the repository
 /dist/
