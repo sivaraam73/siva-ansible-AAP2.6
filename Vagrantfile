@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
     AAP_IP = "192.168.50.50"
 
     aap.vm.box = "almalinux/9"
-    aap.vm.disk :disk, size: "50GB", primary: true
+    aap.vm.disk :disk, size: "60GB", primary: true
     #aap.vm.box_version = "9.7.20260502"
     aap.vm.box_version = "9.7.20251119"
     aap.vm.hostname = AAP_HOSTNAME
@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
       bridge: NETWORK_IF
 
     aap.vm.provider "virtualbox" do |vb|
-      vb.memory = "12288"
+      vb.memory = "16384"
       vb.cpus = 4
     end
 
