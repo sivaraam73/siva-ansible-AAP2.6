@@ -8,8 +8,7 @@ Vagrant.configure("2") do |config|
 
     aap.vm.box = "almalinux/10"
     aap.vm.disk :disk, size: "60GB", primary: true
-    #aap.vm.box_version = "9.7.20260502"
-    aap.vm.box_version = "9.7.20251119"
+    aap.vm.box_version = "10.1.20251125"
     aap.vm.hostname = AAP_HOSTNAME
 
     # --- AAP Containerized Ports ---
