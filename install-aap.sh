@@ -30,7 +30,6 @@ sudo dnf upgrade -y
 sleep 3
 sudo dnf install -y \
   ansible-core \
-  ansible \
   git \
   wget \
   curl \
