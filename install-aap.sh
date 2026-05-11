@@ -11,11 +11,6 @@ echo "# ------------------------------------------------------------"
 sudo hostnamectl set-hostname "$AAP_HOSTNAME"
 
 
-# Define the entry
-ENTRY="127.0.0.1  example.com"
-HOSTS_FILE="/etc/hosts"
-
-
 sudo sed -i 's/^::1/# ::1/' /etc/hosts
 
 echo "127.0.0.1   $AAP_HOSTNAME" | sudo tee -a /etc/hosts
