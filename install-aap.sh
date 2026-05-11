@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 AAP_HOSTNAME="$1"
 AAP_IP="$2"
 
@@ -15,6 +16,8 @@ sudo sed -i 's/^::1/# ::1/' /etc/hosts
 
 echo "127.0.0.1   $AAP_HOSTNAME" | sudo tee -a /etc/hosts
 echo "$AAP_IP    $AAP_HOSTNAME"  | sudo tee -a /etc/hosts
+
+
 sudo dnf install -y cloud-utils-growpart
 sudo growpart /dev/sda 4
 sudo xfs_growfs /

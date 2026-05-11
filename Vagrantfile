@@ -9,6 +9,7 @@ Vagrant.configure("2") do |config|
     aap.vm.box = "almalinux/10"
     aap.vm.disk :disk, size: "60GB", primary: true
     aap.vm.box_version = "10.1.20251125"
+    aap.vm.synced_folder ".", "/vagrant", type: "rsync"
     aap.vm.hostname = AAP_HOSTNAME
 
     # --- AAP Containerized Ports ---
@@ -56,6 +57,7 @@ Vagrant.configure("2") do |config|
     node1.vm.box = "almalinux/9"
     node1.vm.box_version = "9.7.20260502"
     node1.vm.hostname = NODE1_HOSTNAME
+    node1.vm.synced_folder ".", "/vagrant", type: "rsync"
 
 
     node1.vm.network "public_network",
@@ -86,6 +88,7 @@ Vagrant.configure("2") do |config|
     winca1.vm.box = "StefanScherer/windows_2022"
     #winca1.vm.box_version = "2601.0.0"
     winca1.vm.hostname = WINCA1_HOSTNAME
+    winca1.vm.synced_folder ".", "/vagrant", type: "rsync"
 
     #winca1.disksize.size = "60GB"
 
