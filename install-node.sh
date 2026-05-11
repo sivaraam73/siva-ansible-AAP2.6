@@ -5,7 +5,7 @@ NODE1_IP="$2"
 
 echo "Installing for host: $NODE1_HOSTNAME"
 sudo dnf update -y && sudo dnf upgrade -y
-sudo dnf install ansible-core git wget curl zip unzip net-tools podman python3 -y
+sudo dnf install ansible-core git wget curl zip unzip net-tools podman python3 nc -y
 
 sed 's/^::1/# ::1/' /etc/hosts | sudo tee /etc/hosts > /dev/null
 echo "127.0.0.1   $NODE1_HOSTNAME" | sudo tee -a /etc/hosts

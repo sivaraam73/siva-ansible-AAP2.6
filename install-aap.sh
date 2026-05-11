@@ -43,7 +43,9 @@ sudo dnf install -y \
   unzip \
   tar \
   net-tools \
-  podman
+  podman \
+  nc
+  
 sudo dnf install python3-pip -y
 python3 -m pip install ansible-builder
 
